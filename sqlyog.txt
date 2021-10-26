@@ -1,0 +1,253 @@
+-- 创建销售数据库
+CREATE DATABASE 销售数据库 CHARACTER SET utf8;
+-- 创建article表
+CREATE TABLE `Article`(
+        商品号 CHAR(10) PRIMARY KEY,-- 将商品号指定为主键
+        商品名 CHAR(10),
+        单价 FLOAT(8),
+        库存量 INT
+);
+`article`
+-- 创建customer表
+CREATE TABLE `customer`(
+        顾客号 CHAR(10) PRIMARY KEY, -- 将顾客号设置为主键
+        顾客名 CHAR(10),
+        性别   CHAR(2),
+        年龄   INT
+);
+-- 创建orderitem表
+CREATE TABLE orderitem(
+        顾客号 CHAR(10),
+        商品号 CHAR(10),
+        数量   INT,
+        购买价 FLOAT(8),
+        购买日期 DATETIME, -- 时间日期类型
+        PRIMARY KEY(顾客号,商品号,购买日期)-- 将这三个字段设置为主键
+);
+-- 设置article表约束
+ALTER TABLE Article ADD CONSTRAINT CK_单价 CHECK (单价>0) ;
+-- 设置外键约束
+-- 创建关系名为[FK_ article_ orderitem]的外键约束
+ALTER TABLE orderitem ADD CONSTRAINT  FK_article_orderitem FOREIGN KEY(商品号) REFERENCES article (商品号);
+-- 创建关系名为[FK_ customer_ orderitem]的外键约束
+ALTER TABLE orderitem ADD CONSTRAINT  FK_customer_orderitem FOREIGN KEY(顾客号) REFERENCES customer (顾客号);
+
+-- 向 article 表里插入数据
+INSERT INTO article VALUE
+('S001','计算机',5000,10),
+('S002','打印机',1000,12),
+('S003','洗衣机',800,10),
+('S004','电冰箱',1100,20);
+
+-- 向 customer 表里插入数据
+INSERT INTO customer VALUE
+('G001','张三','男',29),
+('G002','李四','女',25),
+('G003','王五','女',31),
+('G004','赵六','男',25);
+
+-- 向 orderitem 表里插入数据
+INSERT INTO orderitem VALUE
+('G001','S001',2,4000,'2015-08-16'),
+('G001','S002',1,800,'2008-01-25'),
+('G001','S003',3,600,'2008-01-25'),
+('G001','S004',1,880,'2008-01-25'),
+('G002','S001',3,4500,'2008-01-01'),
+('G003','S001',1,5000,'2008-01-01'),
+('G003','S002',1,1000,'2008-01-01');
+
+
+-- 创建学生数据库
+CREATE DATABASE 学生数据库 CHARACTER SET utf8;
+-- 创建学生表
+CREATE TABLE student (
+        sno CHAR(4) PRIMARY KEY,
+        sn  CHAR(8),
+        sex CHAR(2),
+        age INT(2),
+        dept INT
+);
+
+-- 创建课程表
+CREATE TABLE course (
+        cno CHAR(4) PRIMARY KEY,
+        cn  CHAR(19)
+);
+
+-- 学生选课表
+CREATE TABLE courseselection (
+        sno CHAR(4),        
+        cno CHAR(4), 
+        grade INT,
+        PRIMARY KEY(sno,cno)  
+);
+-- 设置年龄约束
+ALTER TABLE student ADD CONSTRAINT ck_age CHECK (age>15 OR age<45) ;
+-- 设置性别约束
+ALTER TABLE student ADD CONSTRAINT ck_sex CHECK (sex='男' OR sex='女') ;
+-- 设置学生所在系约束
+ALTER TABLE student ADD CONSTRAINT ck_dept CHECK (dept>1 OR dept<9) ;
+-- 向student表中插入数据
+INSERT INTO student VALUE
+('S1','徐啸'，'女'，17，2），
+('S2','辛国华'，'男'，18，6），
+('S3','徐玮'，'女'，20，1），
+('S4','邓一鸥'，'男'，23，6），
+('S5','张激扬'，'男'，19，6），
+('S6','张辉'，'女'，22，3），
+('S7','王克华'，'男'，18，6），
+('S8','王刃'，'男'，19，3），
+
+-- 向course表中插入数据
+INSERT INTO course VALUE
+('C1','数学'),
+('C2','英语'),
+('C3','Fortran77'),
+('C4','Pascal'),
+('C5','政治'),
+('C6','物理'),
+('C7','逻辑');
+
+-- 向courseselection表中插入数据
+INSERT INTO courseselection VALUE
+('S1','C1',80),
+('S1','C2',85),
+('S1','C4',56),
+('S1','C5',90),
+('S1','C6',75),
+('S2','C1',47),
+('S2','C3',80),
+('S2','C4',75),
+('S2','C5',70),
+('S3','C1',76),
+('S3','C2',70),
+('S3','C3',85),
+('S3','C4',86),
+('S3','C5',90),
+('S3','C6',99),
+('S4','C1',83),
+('S4','C2',85),
+('S4','C3',83),
+('S5','C2',99),
+('S6','C1',96),
+('S6','C2',80),
+('S6','C3',87);
+
+-- 练习：从学生中，检索出分数大于85, 小于95 之间的学生号及课程号，并用汉字显示
+SELECT sno 学生号,cno 课程号,grade 成绩 FROM courseselection
+WHERE grade >85 AND grade <95
+
+-- 从学生中，检索出学号分别为S2，S4，S6的学生姓名，年龄，并用汉字显示其属性
+SELECT sn 学生名,age 学生年龄 FROM student
+WHERE sno IN ('S2','S4','S6')
+
+-- 检索所有比徐萍年龄大的学生姓名，年龄，性别以及徐萍的年龄，结果标题用中文
+SELECT t.`sn` 姓名,t.age 年龄,t.sex 性别, t1.age 徐萍的年龄
+FROM student t , student t1
+WHERE t.`age` >t1.age
+AND t1.`sn` = '徐萍';
+
+-- 查询姓徐的同学的课程成绩情况
+SELECT student.sn 姓名,courseselection.cno 课程名,courseselection.grade 分数
+FROM courseselection
+JOIN student ON courseselection.sno =student.sno 
+JOIN course ON course.cno = courseselection.cno
+WHERE sn LIKE '徐%'
+
+-- 查询与学号S5同学相同系别的学号
+SELECT sn 与S5同样的姓名,dept 系别,sno 学号
+FROM student
+WHERE dept IN(SELECT dept FROM student WHERE sno = 'S6')
+
+-- 练习使用统计函数的查询
+SELECT COUNT(sno) 学生总数 ,AVG(age) 年龄,MAX(age) 最大年龄,MIN(age) 最小年龄
+FROM student
+
+-- 查询学生表并按学生号降序排序
+SELECT *
+FROM student
+ORDER BY sno DESC;
+
+-- 查询学生表里男女的人数
+SELECT sex 性别,COUNT(*) 人数
+FROM student
+GROUP BY sex
+
+
+
+
+三国数据库
+
+
+
+-- 1查询出部门编号为30的所有员工
+SELECT *
+FROM t_employees
+WHERE deptno = 30
+
+-- 2所有经理的姓名、编号和部门编号
+SELECT ename,empno,deptno
+FROM t_employees
+WHERE job = '经理'
+
+-- 3找出奖金高于工资的员工
+SELECT *
+FROM t_employees 
+WHERE comm > sal
+
+-- 4找出奖金高于工资60%的员工
+SELECT *
+FROM t_employees 
+WHERE comm > (sal*0.6)
+
+-- 5找出部门编号为10中所有经理，和部门编号为20中所有分析员的详细资料
+ SELECT * 
+ FROM t_employees
+ WHERE (deptno=10 AND job='经理') OR (deptno=20 AND job='分析员')
+
+-- 6找出部门编号为10中所有经理，部门编号为20中所有分析员，还有即不是经理又不是武装上将但其工资大或等于3000的所有员工详细资料。
+SELECT * 
+FROM t_employees 
+WHERE (deptno=10 AND job='经理') OR (deptno=20 AND job='分析员') OR (sal>=3000 AND job!='经理' AND job!='武装上将')
+
+-- 7无奖金或奖金低于1000的员工
+SELECT * 
+FROM t_employees 
+WHERE comm<1000 OR comm IS NULL
+
+-- 8查询名字由三个字组成的员工
+SELECT * 
+FROM t_employees 
+WHERE ename LIKE "___"
+
+-- 9查询2000年以及以后入职的员工
+SELECT * 
+FROM t_employees 
+WHERE hiredate LIKE'2___-%'
+
+-- 10查询所有员工详细信息，用编号升序排序
+SELECT * 
+FROM t_employees 
+ORDER BY empno ASC
+
+-- 11查询所有员工详细信息，用工资降序排序，如果工资相同使用入职日期升序排序
+ SELECT *
+ FROM t_employees 
+ ORDER BY sal DESC,hiredate ASC
+
+-- 12查询每个部门的平均工资
+SELECT b.deptno,AVG(a.sal) 
+FROM t_employees  a,t_dept  b
+WHERE a.deptno = b.deptno
+GROUP BY a.deptno 
+
+-- 12查询每个部门的雇员数量
+SELECT deptno,COUNT(1)
+FROM t_employees 
+GROUP BY deptno
+
+-- 14查询每种工作的最高工资、最低工资、人数
+SELECT job,MAX(sal),MIN(sal),COUNT(1)
+FROM t_employees
+GROUP BY job
+
