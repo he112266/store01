@@ -35,7 +35,7 @@ def send_email(name):
 
     # 构造邮件对象
     message = MIMEMultipart()
-    message['From'] = Header("shinensama", 'utf-8')
+    message['From'] = Header("cc", 'utf-8')
     message['To'] = Header("Jason", 'utf-8')
     message['Subject'] = Header(subject, 'utf-8')
     message_content = "附件为测试结果"
